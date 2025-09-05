@@ -27,7 +27,7 @@ class GetWikidataTrackingJob implements ShouldQueue
     public function handle(): void
     {
         //
-        $wd =WikidataTracking::where('last_sync', '<', now()->subDays(1))->first();
+        $wd =WikidataTracking::where('last_sync', '<', now()->subDays(1))->orderBy('last_sync','asc')->first();
         if($wd) {
         $data = Http::get('https://wikidata.org/w/rest.php/wikibase/v1/entities/items/'.$wd->item.'?_fields=sitelinks')->json();
         foreach($data['sitelinks'] as $sitelink) 

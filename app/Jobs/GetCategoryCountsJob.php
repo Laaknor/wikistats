@@ -26,7 +26,7 @@ class GetCategoryCountsJob implements ShouldQueue
     public function handle(): void
     {
         //
-        $categories = Category::where('type','categorycount')->where('last_sync','<',now()->subDays(1))->orderBy('last_sync','asc')->get();
+        $categories = Category::where('type','categorycount')->where('last_sync','<',now()->subDays(1))->orderBy('last_sync','asc')->take(5)->get();
         foreach($categories as $category) {
             $url = $category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category->name.'&format=json';
             $data = Http::get($url)->json();
