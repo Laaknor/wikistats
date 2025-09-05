@@ -17,12 +17,25 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         WikidataTracking::firstOrCreate([
-            'item' => 'Q8235724',
+            'item' => 'Q8235724', // {{relevans}}
             'type' => 'categorycount',
         ]);
         WikidataTracking::firstOrCreate([
-            'item' => 'Q6867401',
+            'item' => 'Q6867401', // {{referanseløs}}
             'type' => 'categorycount',
         ]);
+        WikidataTracking::firstOrCreate([
+            'item' => 'Q5897849', // {{tr}}
+            'type' => 'categorycount',
+        ]);
+        WikidataTracking::firstOrCreate([
+            'item' => 'Q9883690', // {{klargjør}}, {{utdyp}}, {{når}}, {{hvem}}, {{av hvem}}, {{hvor}}
+            'type' => 'categorycount',
+        ]);
+        WikidataTracking::firstOrCreate([
+            'item' => 'Q9879477', // {{død lenke}}
+            'type' => 'categorycount',
+        ]);
+      
     }
 }
