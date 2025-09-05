@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'type' => 'categorycount',
         ]);
         WikidataTracking::firstOrCreate([
-            'item' => 'Q6867401', // {{referanseløs}}
+            'item' => 'Q9884765', // {{referanseløs}}
             'type' => 'categorycount',
         ]);
         WikidataTracking::firstOrCreate([
