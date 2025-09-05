@@ -10,9 +10,9 @@ class TestController extends Controller
     //
     public function index()
     {
-        $data = Http::get('https://wikidata.org/w/rest.php/wikibase/v1/entities/items/Q8235724?_fields=sitelinks');
+        //$data = Http::get('https://wikidata.org/w/rest.php/wikibase/v1/entities/items/Q8235724?_fields=sitelinks');
             //->getBody();
             
-        return $data;
+        //return $data;
     }
 }
