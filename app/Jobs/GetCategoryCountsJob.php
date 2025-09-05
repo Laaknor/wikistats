@@ -7,6 +7,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use App\Models\Category;
 use App\Models\CategoryCount;
+use Illuminate\Support\Facades\Log;
 
 class GetCategoryCountsJob implements ShouldQueue
 {
@@ -31,11 +32,16 @@ class GetCategoryCountsJob implements ShouldQueue
             $url = $category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category->name.'&format=json';
             $data = Http::get($url)->json();
             foreach($data['query']['pages'] as $c) {
-                CategoryCount::updateOrCreate([
-                    'category_id' => $category->id,
-                    'date' => now()->format('Y-m-d'),
-                    'count' => $c['categoryinfo']['pages'],
-                ]);
+                if(isset($c['categoryinfo']['pages'])) {
+                    CategoryCount::updateOrCreate([
+                        'category_id' => $category->id,
+                            'date' => now()->format('Y-m-d'),
+                            'count' => $c['categoryinfo']['pages'],
+                        ]);
+                }
+                else {
+                    Log::error( "No pages found for ".$category->name);
+                }
             }
             $category->last_sync = now();
             $category->save();
