@@ -20,5 +20,9 @@ class DatabaseSeeder extends Seeder
             'item' => 'Q8235724',
             'type' => 'categorycount',
         ]);
+        WikidataTracking::firstOrCreate([
+            'item' => 'Q6867401',
+            'type' => 'categorycount',
+        ]);
     }
 }
