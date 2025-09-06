@@ -36,6 +36,14 @@ class DatabaseSeeder extends Seeder
             'item' => 'Q9879477', // {{død lenke}}
             'type' => 'categorycount',
         ]);
+        WikidataTracking::firstOrCreate([
+            'item' => 'Q9884723', // {{kildeløs}}
+            'type' => 'categorycount',
+        ]);
+        WikidataTracking::firstOrCreate([
+            'item' => 'Q9882887', // {{refforbedre}}
+            'type' => 'categorycount',
+        ]);
       
     }
 }
