@@ -1,9 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TestController;
+use App\Http\Controllers\SiteController;
+use App\Http\Controllers\GraphController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::resource('test', TestController::class);
+Route::view('/', 'welcome');
+
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
+
+require __DIR__.'/auth.php';
+Route::resource('site', SiteController::class)
+    ->parameters(['site' => 'site:hostname']);
+Route::resource('graph', GraphController::class);
