@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 Schedule::job(new App\Jobs\GetWikidataTrackingJob())->hourlyAt(14);
 Schedule::job(new App\Jobs\GetCategoryCountsJob())->everyFiveMinutes();
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
+Schedule::job(new App\Jobs\GetSiteInfoJob())->hourlyAt(24);
