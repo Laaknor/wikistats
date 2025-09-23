@@ -83,7 +83,7 @@ class ShowCategoryGraph extends Component
             ->labels($labels)
             ->datasets([
                 [
-                    "label" => "Category_".$this->category->name."_Count",
+                    "label" => $this->category->name,
                     "backgroundColor" => "rgba(38, 185, 154, 0.31)",
                     "borderColor" => "rgba(38, 185, 154, 0.7)",
                     "data" => $data
