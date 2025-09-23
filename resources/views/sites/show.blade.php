@@ -11,7 +11,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @foreach($categories as $category)
-                        @livewire('show-category-graph')
+                        @livewire('show-category-graph', ['category' => $category])
                     @endforeach
                 </div>
             </div>

@@ -4,7 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\GraphController;
 
-Route::view('/', 'welcome');
+#Route::view('/', 'welcome');
+Route::get('/', function() {
+    return redirect()->route('site.index');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
