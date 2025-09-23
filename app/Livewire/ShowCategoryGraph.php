@@ -56,7 +56,7 @@ class ShowCategoryGraph extends Component
 
         $start = Carbon::parse($minDate);
         $end = now();
-        $period = CarbonPeriod::create($start, "1 month", $end);
+        $period = CarbonPeriod::create($start, "1 week", $end);
 
         $categoryCountPerMonth = collect($period)->map(function ($date) {
             $endDate = $date->copy()->endOfWeek();
@@ -94,15 +94,18 @@ class ShowCategoryGraph extends Component
                     'x' => [
                         'type' => 'time',
                         'time' => [
-                            'unit' => 'month'
+                            'unit' => 'week'
                         ],
                         'min' => $start->format("Y-m-d"),
+                    ],
+                    'y' => [
+                        'min' => 0,
                     ]
                 ],
                 'plugins' => [
                     'title' => [
                         'display' => true,
-                        'text' => 'Monthly '.$this->category->name.' Count'
+                        'text' => 'Weekly '.$this->category->name.' Count'
                     ]
                 ]
             ]);
