@@ -26,7 +26,7 @@ class GetSiteInfoJob implements ShouldQueue
     public function handle(): void
     {
         //
-        $sites = Site::where('last_siteinfo','<',now()->subDays(1))->orWhere('last_siteinfo',null)->orderBy('last_siteinfo','asc')->take(5)->get();
+        $sites = Site::where('last_siteinfo','<',now()->subDays(7))->orWhere('last_siteinfo',null)->orderBy('last_siteinfo','asc')->take(1)->get();
         foreach($sites as $site) {
             $url = $site->url.'w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json';
             $data = Http::get($url)->json();
