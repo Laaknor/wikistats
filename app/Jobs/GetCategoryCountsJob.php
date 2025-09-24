@@ -42,6 +42,10 @@ class GetCategoryCountsJob implements ShouldQueue
                 else {
                     Log::error( "No pages found for ".$category->name);
                 }
+                if($category->mw_category_id != $c['pageid']) {
+                    $category->mw_category_id = $c['pageid'];
+                    $category->save();
+                }
             }
             $category->last_sync = now();
             $category->save();
