@@ -62,10 +62,10 @@ class ShowCategoryGraph extends Component
             $endDate = $date->copy()->endOfWeek();
             $startDate = $date->copy()->startOfWeek();
 
-            $avgCount = CategoryCount::where('date', '>=', $startDate)
+            $avgCount = round(CategoryCount::where('date', '>=', $startDate)
                 ->where('date', '<=', $endDate)
                 ->where('category_id', $this->category->id)
-                ->avg('count');
+                ->avg('count'));
 
             return [
                 "count" => $avgCount ?? 0, // Handle null values
@@ -83,7 +83,7 @@ class ShowCategoryGraph extends Component
             ->labels($labels)
             ->datasets([
                 [
-                    "label" => $this->category->name,
+                    "label" => $this->category->display_name,
                     "backgroundColor" => "rgba(38, 185, 154, 0.31)",
                     "borderColor" => "rgba(38, 185, 154, 0.7)",
                     "data" => $data
