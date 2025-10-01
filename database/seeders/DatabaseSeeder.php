@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\WikidataTracking;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use App\Models\UrlScan;
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -44,6 +44,9 @@ class DatabaseSeeder extends Seeder
             'item' => 'Q9882887', // {{refforbedre}}
             'type' => 'categorycount',
         ]);
-      
+        UrlScan::firstOrCreate([
+            'urltype' => 'normal',
+            'url' => 'https://archive.org/details/wikimediadownloads',
+        ]);
     }
 }
