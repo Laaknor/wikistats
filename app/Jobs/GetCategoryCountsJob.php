@@ -46,6 +46,10 @@ class GetCategoryCountsJob implements ShouldQueue
                     $category->mw_category_id = $c['pageid'];
                     $category->save();
                 }
+                if($category->display_name != $c['title']) {
+                    $category->display_name = $c['title'];
+                    $category->save();
+                }
             }
             $category->last_sync = now();
             $category->save();
