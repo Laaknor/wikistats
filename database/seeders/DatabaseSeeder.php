@@ -44,9 +44,9 @@ class DatabaseSeeder extends Seeder
             'item' => 'Q9882887', // {{refforbedre}}
             'type' => 'categorycount',
         ]);
-        UrlScan::firstOrCreate([
-            'urltype' => 'normal',
-            'url' => 'https://archive.org/details/wikimediadownloads',
-        ]);
+#        UrlScan::firstOrCreate([
+#            'urltype' => 'normal',
+#            'url' => 'https://archive.org/details/wikimediadownloads',
+#        ]);
     }
 }
