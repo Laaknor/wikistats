@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\ArchiveItem;
+use Illuminate\Support\Str;
 
 class wikistats_import_archive extends Command
 {
