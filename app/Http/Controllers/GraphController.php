@@ -42,7 +42,7 @@ class GraphController extends Controller
         
         $category = Category::find($id);
         #dd($category);
-        $data = CategoryCount::where('category_id', $category->id)->get();
+        $data = CategoryCount::where('category_id', $category->id)->orderBy('date','asc')->get();
         $chart = Chartjs::build()
             ->name('lineChartTest')
             ->type('line')

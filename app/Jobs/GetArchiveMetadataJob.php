@@ -29,14 +29,23 @@ class GetArchiveMetadataJob implements ShouldQueue
         foreach($archiveItem AS $item) {
             $metadata = exec ('ia metadata '.$item->identifier);
             $data = json_decode($metadata, true);
+            
             foreach($data['files'] as $file) {
+                $size = $file['size'] ?? 0;
+                $dbname = strstr($file['name'], "-", true) ?? null;
                 ArchiveFile::updateOrCreate([
                     'filename' => $file['name'],
                     'archive_item_id' => $item->id,
-                ]);
+                ],
+                [
+                    'size' => $size,
+                    'dbname' => $dbname,
+                ]
+                );
             }
             $item->last_sync = now();
             $item->publish_date = $data['metadata']['date'];
+            
             $item->save();
         }
     }
