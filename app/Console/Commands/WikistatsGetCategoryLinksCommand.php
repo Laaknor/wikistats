@@ -33,7 +33,7 @@ class WikistatsGetCategoryLinksCommand extends Command
     {
         //
         $sites = Site::all()->pluck('dbname')->toArray();
-        $file =ArchiveFile::where('filename','like','%-%-%categorylinks%')->where('last_sync',null)->whereIn('dbname',$sites)->inRandomOrder()->first();
+        $file =ArchiveFile::where('filename','like','%-%-%categorylinks%.sql.gz')->where('last_sync',null)->whereIn('dbname',$sites)->inRandomOrder()->first();
         if($file) {
             $item = ArchiveItem::find($file->archive_item_id);
             $download = exec("ia download $item->identifier $file->filename --destdir=temp/");
