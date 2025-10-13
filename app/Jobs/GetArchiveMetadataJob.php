@@ -44,7 +44,7 @@ class GetArchiveMetadataJob implements ShouldQueue
                 );
             }
             $item->last_sync = now();
-            $item->publish_date = $data['metadata']['date'];
+            $item->publish_date = $data['metadata']['date'] ?? $data['metadata']['addeddate'];
             
             $item->save();
         }
