@@ -17,4 +17,7 @@ Schedule::job(new App\Jobs\GetCategoryCountsJob())->everyMinute()
     });
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
 Schedule::job(new App\Jobs\GetSiteInfoJob())->hourlyAt(24);
-#Schedule::job(new App\Jobs\GetUrlscanJob())->monthlyOn(1, '00:00');
+Schedule::job(new App\Jobs\GetArchiveMetadataJob())->everyFiveMinutes()
+    ->when(function() {
+        return App\Models\ArchiveItem::where('last_sync',null)->count() > 0;
+    });

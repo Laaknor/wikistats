@@ -21,3 +21,4 @@ require __DIR__.'/auth.php';
 Route::resource('site', SiteController::class)
     ->parameters(['site' => 'site:hostname']);
 Route::resource('graph', GraphController::class);
+Route::get('test', [App\Http\Controllers\TestController::class, 'index']);
