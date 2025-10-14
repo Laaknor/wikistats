@@ -41,7 +41,7 @@ class WikistatsGetCategoryLinksCommand extends Command
             $this->info('Downloaded: '.$file->filename);
             $this->info('Starting to import SQL-file');
             $this->info("Starttidspunkt: ".now());
-            #exec("zcat temp/".$item->identifier."/".$file->filename." | mysql");
+            exec("zcat temp/".$item->identifier."/".$file->filename." | mysql");
             
             $this->info('Imported SQL-file');
             $this->info("Sluttidspunkt: ".now());
