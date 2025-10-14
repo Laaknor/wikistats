@@ -56,7 +56,7 @@ class WikistatsGetCategoryLinksCommand extends Command
             $this->info('Site: '.$site->url);
             $categories = Category::where('site_id',$site->id)->get();
             foreach($categories as $category) {
-                $this->info('Category: '.$category->name);
+                $this->info('Category: '.$category->display_name);
                 $catname = str_replace(' ','_',substr(strstr($category->display_name, ":", false), 1));
                 $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to = '".$catname."' AND cl_type = 'page'");
                 $this->info('Count: '.$count[0]->amount);
