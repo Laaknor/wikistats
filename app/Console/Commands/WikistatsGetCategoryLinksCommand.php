@@ -41,7 +41,7 @@ class WikistatsGetCategoryLinksCommand extends Command
             $this->info('Downloaded: '.$file->filename);
             $this->info('Starting to import SQL-file');
             $this->info("Starttidspunkt: ".now());
-            exec("zcat temp/".$item->identifier."/".$file->filename." | mysql");
+            #exec("zcat temp/".$item->identifier."/".$file->filename." | mysql");
             
             $this->info('Imported SQL-file');
             $this->info("Sluttidspunkt: ".now());
@@ -57,7 +57,7 @@ class WikistatsGetCategoryLinksCommand extends Command
             $categories = Category::where('site_id',$site->id)->get();
             foreach($categories as $category) {
                 $this->info('Category: '.$category->name);
-                $catname =substr(strstr($category->name, ":", false), 1);
+                $catname = str_replace(' ','_',substr(strstr($category->display_name, ":", false), 1));
                 $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to = '".$catname."' AND cl_type = 'page'");
                 $this->info('Count: '.$count[0]->amount);
                 CategoryCount::updateOrCreate([
