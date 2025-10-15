@@ -34,7 +34,7 @@ class ShowCategoryGraph extends Component
         }
 
         // Get date range, with fallback if no data exists
-        $minDate = CategoryCount::min('date');
+        $minDate = CategoryCount::where('category_id',$this->category->id)->min('date');
         if (!$minDate) {
             // No data available, create empty chart
             $chart = Chartjs::build()
@@ -47,7 +47,7 @@ class ShowCategoryGraph extends Component
                         "label" => "CategoryCount",
                         "backgroundColor" => "rgba(38, 185, 154, 0.31)",
                         "borderColor" => "rgba(38, 185, 154, 0.7)",
-                        "data" => []
+                        "data" => [],
                     ]
                 ]);
             
@@ -56,22 +56,26 @@ class ShowCategoryGraph extends Component
 
         $start = Carbon::parse($minDate);
         $end = now();
-        $period = CarbonPeriod::create($start, "1 week", $end);
+        $period = CarbonPeriod::create($start, "1 month", $end);
 
         $categoryCountPerMonth = collect($period)->map(function ($date) {
-            $endDate = $date->copy()->endOfWeek();
-            $startDate = $date->copy()->startOfWeek();
+            $endDate = $date->copy()->endOfMonth();
+            $startDate = $date->copy()->startOfMonth();
 
-            $avgCount = round(CategoryCount::where('date', '>=', $startDate)
+            $avgCount = CategoryCount::where('date', '>=', $startDate)
                 ->where('date', '<=', $endDate)
                 ->where('category_id', $this->category->id)
-                ->avg('count'));
+                ->avg('count');
 
-            return [
-                "count" => $avgCount ?? 0, // Handle null values
-                "month" => $endDate->format("Y-m-d")
-            ];
-        });
+            // Only include months that have data (avgCount is not null)
+            if ($avgCount !== null) {
+                return [
+                    "count" => round($avgCount),
+                    "month" => $endDate->format("Y-m")
+                ];
+            }
+            return null; // Return null for months with no data
+        })->filter(); // Remove null entries (months with no data)
         
         $data = $categoryCountPerMonth->pluck("count")->toArray();
         $labels = $categoryCountPerMonth->pluck("month")->toArray();
@@ -86,7 +90,8 @@ class ShowCategoryGraph extends Component
                     "label" => $this->category->display_name,
                     "backgroundColor" => "rgba(38, 185, 154, 0.31)",
                     "borderColor" => "rgba(38, 185, 154, 0.7)",
-                    "data" => $data
+                    "data" => $data,
+                    "spanGaps" => true
                 ]
             ])
             ->options([
@@ -94,7 +99,7 @@ class ShowCategoryGraph extends Component
                     'x' => [
                         'type' => 'time',
                         'time' => [
-                            'unit' => 'week'
+                            'unit' => 'month'
                         ],
                         'min' => $start->format("Y-m-d"),
                     ],
