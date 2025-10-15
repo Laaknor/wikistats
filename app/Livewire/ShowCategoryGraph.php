@@ -110,7 +110,7 @@ class ShowCategoryGraph extends Component
                 'plugins' => [
                     'title' => [
                         'display' => true,
-                        'text' => 'Weekly '.$this->category->name.' Count'
+                        'text' => 'Monthly '.$this->category->display_name.' Count'
                     ]
                 ]
             ]);
