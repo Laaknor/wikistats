@@ -16,7 +16,10 @@ Schedule::job(new App\Jobs\GetCategoryCountsJob())->everyMinute()
         return App\Models\Category::where('last_sync','<',now()->subDays(7))->count() > 0;
     });
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
-Schedule::job(new App\Jobs\GetSiteInfoJob())->hourlyAt(24);
+Schedule::job(new App\Jobs\GetSiteInfoJob())->everyFiveMinutes()
+    ->when(function() {
+        return App\Models\Site::where('last_siteinfo','<',now()->subDays(7))->count() > 0;
+    });
 Schedule::job(new App\Jobs\GetArchiveMetadataJob())->everyFiveMinutes()
     ->when(function() {
         return App\Models\ArchiveItem::where('last_sync',null)->count() > 0;
