@@ -14,7 +14,7 @@ class SiteController extends Controller
     public function index()
     {
         //
-        $sites = Site::orderBy('hostname','asc')->get();
+        $sites = Site::orderBy('family','asc')->orderBy('hostname','asc')->get();
         return view('sites.index', compact('sites'));
     }
 
