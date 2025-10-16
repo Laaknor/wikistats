@@ -20,5 +20,10 @@ Route::view('profile', 'profile')
 require __DIR__.'/auth.php';
 Route::resource('site', SiteController::class)
     ->parameters(['site' => 'site:hostname']);
-Route::resource('graph', GraphController::class);
+Route::resource('graph', GraphController::class)
+    ->parameters(['graph' => 'category:id']);
+Route::get('graph-small/{category}', [GraphController::class, 'showSmall'])
+    ->name('graph.small');
+Route::get('graph-image/{category}', [GraphController::class, 'showSmallImage'])
+    ->name('graph.image');
 Route::get('test', [App\Http\Controllers\TestController::class, 'index']);
