@@ -23,8 +23,9 @@ new class extends Component
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('site.index') }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('site.index') }}" wire:navigate class="flex items-center space-x-3">
+                        <img src="{{ asset('images/WikiStats-logo.png') }}" alt="WikiStats" class="h-6 w-auto">
+                        <span class="text-xl font-bold text-gray-800">WikiStats</span>
                     </a>
                 </div>
 
