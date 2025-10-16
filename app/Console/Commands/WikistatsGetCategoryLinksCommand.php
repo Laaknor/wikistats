@@ -9,6 +9,7 @@ use App\Models\Site;
 use App\Models\Category;
 use App\Models\CategoryCount;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class WikistatsGetCategoryLinksCommand extends Command
 {
@@ -56,15 +57,26 @@ class WikistatsGetCategoryLinksCommand extends Command
             $this->info('Site: '.$site->url);
             $categories = Category::where('site_id',$site->id)->get();
             foreach($categories as $category) {
+                $category_count = 0;
                 $this->info('Category: '.$category->display_name);
                 $catname = str_replace(' ','_',substr(strstr($category->display_name, ":", false), 1));
-                $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to = '".$catname."' AND cl_type = 'page'");
-                $this->info('Count: '.$count[0]->amount);
+                if ($category->type === 'subcategorycount') {
+                    $subcategories = DB::select("SELECT * FROM categorylinks WHERE cl_to LIKE '".$catname."' AND cl_type = 'subcat'");
+                    foreach($subcategories as $subcategory) {
+                        $sortkey = Str::ucfirst(Str::lower(str_replace(' ','_',$subcategory->cl_sortkey)));
+                        $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to LIKE '".$sortkey."' AND cl_type = 'page'");
+                        $category_count += $count[0]->amount;
+                    }
+                } else {
+                    $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to = '".$catname."' AND cl_type = 'page'");
+                    $category_count = $count[0]->amount;
+                }
+                $this->info('Count: '.$category_count);
                 CategoryCount::updateOrCreate([
                     'category_id' => $category->id,
                     'date' => $date
                 ], [
-                    'count' => $count[0]->amount,
+                    'count' => $category_count,
                 ]);
             }
             $file->last_sync = now();
