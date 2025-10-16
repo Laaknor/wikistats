@@ -42,10 +42,22 @@ class WikistatsGetCategoryLinksCommand extends Command
             $this->info('Downloaded: '.$file->filename);
             $this->info('Starting to import SQL-file');
             $this->info("Starttidspunkt: ".now());
+            
             exec("zcat temp/".$item->identifier."/".$file->filename." | mysql");
             
-            $this->info('Imported SQL-file');
+            $this->info('Imported SQL-file categorylinks');
             $this->info("Sluttidspunkt: ".now());
+            $findPageFile = ArchiveFile::where('archive_item_id',$file->archive_item_id)->where('filename','like','%page.sql.gz')->first();
+            if($findPageFile) {
+                $item = ArchiveItem::find($findPageFile->archive_item_id);
+                $download = exec("ia download $item->identifier $findPageFile->filename --destdir=temp/");
+                $this->info('Downloaded: '.$findPageFile->filename);
+                $this->info('Starting to import SQL-file page');
+                $this->info("Starttidspunkt: ".now());
+                exec("zcat temp/".$item->identifier."/".$findPageFile->filename." | mysql");
+                $this->info('Imported SQL-file page');
+                $this->info("Sluttidspunkt: ".now());
+            }
 
             $explode = explode('-', $file->filename);
             $dbname = $explode[0];
@@ -61,12 +73,9 @@ class WikistatsGetCategoryLinksCommand extends Command
                 $this->info('Category: '.$category->display_name);
                 $catname = str_replace(' ','_',substr(strstr($category->display_name, ":", false), 1));
                 if ($category->type === 'subcategorycount') {
-                    $subcategories = DB::select("SELECT * FROM categorylinks WHERE cl_to LIKE '".$catname."' AND cl_type = 'subcat'");
-                    foreach($subcategories as $subcategory) {
-                        $sortkey = Str::ucfirst(Str::lower(str_replace(' ','_',$subcategory->cl_sortkey)));
-                        $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to LIKE '".$sortkey."' AND cl_type = 'page'");
-                        $category_count += $count[0]->amount;
-                    }
+                    $subcategories = DB::select("SELECT COUNT(*) AS antall FROM categorylinks cl WHERE cl_type = 'page' AND cl_to IN (SELECT page_title FROM page WHERE page_id IN (SELECT cl_from FROM categorylinks WHERE cl_to = '$catname' AND cl_type = 'subcat'));");
+
+                    $category_count = $subcategories[0]->antall;
                 } else {
                     $count = DB::select("SELECT COUNT(*) AS amount FROM categorylinks WHERE cl_to = '".$catname."' AND cl_type = 'page'");
                     $category_count = $count[0]->amount;
