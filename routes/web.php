@@ -27,3 +27,4 @@ Route::get('graph-small/{category}', [GraphController::class, 'showSmall'])
 Route::get('graph-image/{category}', [GraphController::class, 'showSmallImage'])
     ->name('graph.image');
 Route::get('test', [App\Http\Controllers\TestController::class, 'index']);
+Route::get('about', [App\Http\Controllers\StaticPageController::class, 'about'])->name('about');
