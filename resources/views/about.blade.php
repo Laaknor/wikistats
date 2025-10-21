@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('About WikiStats') }}
+            {{ __('About Maintenalyzer') }}
         </h2>
     </x-slot>
 
@@ -16,7 +16,7 @@
                         <div class="mb-8">
                             <h2 class="text-2xl font-semibold text-gray-800 mb-4">What is WikiStats?</h2>
                             <p class="text-lg text-gray-700 leading-relaxed mb-4">
-                                WikiStats is a comprehensive analytics platform designed to track and visualize category growth across Wikipedia and other Wikimedia Foundation wikis. The platform provides insights into how different categories expand over time, helping researchers, editors, and enthusiasts understand the evolution of knowledge organization on Wikimedia projects.
+                            Maintenalyzer is a comprehensive analytics platform designed to track and visualize category growth across Wikipedia and other Wikimedia Foundation wikis. The platform provides insights into how different categories expand over time, helping researchers, editors, and enthusiasts understand the evolution of knowledge organization on Wikimedia projects.
                             </p>
                         </div>
 
@@ -35,7 +35,7 @@
                             
                             <h3 class="text-xl font-medium text-gray-800 mb-3">3. Archive.org Integration for historical data</h3>
                             <p class="text-gray-700 mb-4">
-                                WikiStats leverages the Internet Archive's comprehensive collection of Wikimedia database dumps. We systematically search and download historical database exports from <a href="https://archive.org/details/wikimediadownloads" class="text-blue-600 hover:text-blue-800 underline">archive.org/details/wikimediadownloads</a>, and other sources for historical data, which contains complete snapshots of Wikipedia and other Wikimedia wikis at different points in time.
+                                Maintenalyzer leverages the Internet Archive's comprehensive collection of Wikimedia database dumps. We systematically search and download historical database exports from <a href="https://archive.org/details/wikimediadownloads" class="text-blue-600 hover:text-blue-800 underline">archive.org/details/wikimediadownloads</a>, and other sources for historical data, which contains complete snapshots of Wikipedia and other Wikimedia wikis at different points in time.
                             </p>
 
                            

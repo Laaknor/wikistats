@@ -24,8 +24,11 @@ new class extends Component
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('site.index') }}" wire:navigate class="flex items-center space-x-3">
-                        <img src="{{ asset('images/WikiStats-logo.png') }}" alt="WikiStats" class="h-6 w-auto">
-                        <span class="text-xl font-bold text-gray-800">WikiStats</span>
+                        <img src="{{ asset('images/WikiStats-logo.png') }}" alt="Maintenalyzer" class="h-6 w-auto">
+                        <div class="flex flex-col">
+                            <span class="text-xl font-bold text-gray-800">Maintenalyzer</span>
+                            <span class="text-xs text-gray-500 -mt-1">Wikipedia Maintenance Statistics</span>
+                        </div>
                     </a>
                 </div>
 
