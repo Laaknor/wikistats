@@ -26,7 +26,7 @@
                     
                     <!-- Footer -->
                     <div class="mt-4 text-center text-sm text-gray-500">
-                        https://wikistats.laaknor.no
+                        https://maintenalyzer.laaknor.no
                     </div>
                 </div>
             </div>

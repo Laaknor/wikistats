@@ -26,7 +26,7 @@
             @endif
         </div>
         <div class="chart-footer">
-            https://wikistats.laaknor.no
+            https://maintenalyzer.laaknor.no
         </div>
     </div>
 </body>
