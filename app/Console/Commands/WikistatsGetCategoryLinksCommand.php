@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\CategoryCount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 
 class WikistatsGetCategoryLinksCommand extends Command
 {
@@ -95,6 +96,8 @@ class WikistatsGetCategoryLinksCommand extends Command
             
 
         }
+        Schema::dropIfExists('categorylinks');
+        Schema::dropIfExists('page');
         $count =ArchiveFile::where('filename','like','%-%-%categorylinks%.sql.gz')->where('last_sync',null)->whereIn('dbname',$sites)->count();
         $this->info('Count of categorylinkfiles left to process: '.$count);
     }
