@@ -14,7 +14,7 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($categories as $category)
-                            <a href="{{ route('graph.show', ['site' => $site->hostname, 'graph' => $category->name]) }}" 
+                            <a href="{{ route('graph.show', ['site' => $site->hostname, 'graph' => urlencode($category->name)]) }}" 
                                class="block bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 overflow-hidden">
                                 <!-- Header -->
                                 <div class="p-4 pb-2">
@@ -27,7 +27,7 @@
                                 <!-- Chart fills remaining space -->
                                 <div class="px-4 pb-4 flex-1">
                                     <div class="bg-white rounded border border-gray-200 overflow-hidden" style="height: 120px;">
-                                        <iframe src="{{ route('graph.small', ['site' => $site->hostname, 'graph' => $category->name]) }}" 
+                                        <iframe src="{{ route('graph.small', ['site' => $site->hostname, 'graph' => urlencode($category->name)]) }}" 
                                                 style="width: 100%; height: 100%; border: none; overflow: hidden;"
                                                 frameborder="0"
                                                 scrolling="no">

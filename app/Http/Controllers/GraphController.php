@@ -18,8 +18,11 @@ class GraphController extends Controller
      */
     public function show(Site $site, $graph)
     {
+        // Handle both single and double URL encoding
+        $decodedGraph = urldecode($graph);
         $category = Category::where('site_id', $site->id)
-                           ->where('name', $graph)
+                           ->where('name', $decodedGraph)
+                           ->orWhere('name', $graph) // Also try the original in case it's not encoded
                            ->firstOrFail();
         
         $graph = $this->buildChart($category, 'large');
@@ -34,8 +37,11 @@ class GraphController extends Controller
      */
     public function showSmall(Site $site, $graph)
     {
+        // Handle both single and double URL encoding
+        $decodedGraph = urldecode($graph);
         $category = Category::where('site_id', $site->id)
-                           ->where('name', $graph)
+                           ->where('name', $decodedGraph)
+                           ->orWhere('name', $graph) // Also try the original in case it's not encoded
                            ->firstOrFail();
         
         $chart = $this->buildChart($category, 'small');
@@ -50,8 +56,11 @@ class GraphController extends Controller
      */
     public function showSmallImage(Site $site, $graph)
     {
+        // Handle both single and double URL encoding
+        $decodedGraph = urldecode($graph);
         $category = Category::where('site_id', $site->id)
-                           ->where('name', $graph)
+                           ->where('name', $decodedGraph)
+                           ->orWhere('name', $graph) // Also try the original in case it's not encoded
                            ->firstOrFail();
         // For now, create a simple placeholder image
         // In production, you would use a library like Puppeteer, wkhtmltopdf, or similar to convert charts to images
