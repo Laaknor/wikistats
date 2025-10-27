@@ -20,11 +20,13 @@ Route::view('profile', 'profile')
 require __DIR__.'/auth.php';
 Route::resource('site', SiteController::class)
     ->parameters(['site' => 'site:hostname']);
-Route::resource('graph', GraphController::class)
-    ->parameters(['graph' => 'category:id']);
-Route::get('graph-small/{category}', [GraphController::class, 'showSmall'])
+
+// Graph routes nested under sites
+Route::get('site/{site:hostname}/graph/{graph:name}', [GraphController::class, 'show'])
+    ->name('graph.show');
+Route::get('site/{site:hostname}/graph-small/{graph:name}', [GraphController::class, 'showSmall'])
     ->name('graph.small');
-Route::get('graph-image/{category}', [GraphController::class, 'showSmallImage'])
+Route::get('site/{site:hostname}/graph-image/{graph:name}', [GraphController::class, 'showSmallImage'])
     ->name('graph.image');
 Route::get('test', [App\Http\Controllers\TestController::class, 'index']);
 Route::get('about', [App\Http\Controllers\StaticPageController::class, 'about'])->name('about');

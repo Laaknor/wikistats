@@ -21,7 +21,7 @@
                             </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                 @foreach($sitesInFamily as $site)
-                                    <a href="{{ route("site.show", [$site->hostname]) }}" 
+                                    <a href="{{ route("site.show", ['site' => $site->hostname]) }}" 
                                        class="block p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors duration-200">
                                         <div class="font-medium text-gray-900">{{ $site->hostname }}</div>
                                         @if($site->language)

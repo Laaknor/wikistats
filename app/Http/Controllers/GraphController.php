@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Site;
 use App\Models\Category;
 use App\Models\CategoryCount;
 use Carbon\Carbon;
@@ -15,8 +16,12 @@ class GraphController extends Controller
     /**
      * Show large graph for a category
      */
-    public function show(Category $category)
+    public function show(Site $site, $graph)
     {
+        $category = Category::where('site_id', $site->id)
+                           ->where('name', $graph)
+                           ->firstOrFail();
+        
         $graph = $this->buildChart($category, 'large');
         if (!$graph) {
             return view('graph.show', ['graph' => null, 'error' => 'Failed to create chart']);
@@ -27,8 +32,12 @@ class GraphController extends Controller
     /**
      * Show small graph for a category
      */
-    public function showSmall(Category $category)
+    public function showSmall(Site $site, $graph)
     {
+        $category = Category::where('site_id', $site->id)
+                           ->where('name', $graph)
+                           ->firstOrFail();
+        
         $chart = $this->buildChart($category, 'small');
         if (!$chart) {
             return view('graph.small', ['chart' => null, 'error' => 'Failed to create chart']);
@@ -39,8 +48,11 @@ class GraphController extends Controller
     /**
      * Generate small chart as image
      */
-    public function showSmallImage(Category $category)
+    public function showSmallImage(Site $site, $graph)
     {
+        $category = Category::where('site_id', $site->id)
+                           ->where('name', $graph)
+                           ->firstOrFail();
         // For now, create a simple placeholder image
         // In production, you would use a library like Puppeteer, wkhtmltopdf, or similar to convert charts to images
         
