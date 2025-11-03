@@ -43,8 +43,14 @@ class WikistatsGetCategoryLinksCommand extends Command
             $this->info('Downloaded: '.$file->filename);
             $this->info('Starting to import SQL-file');
             $this->info("Starttidspunkt: ".now());
-            
-            exec("zcat temp/".$item->identifier."/".$file->filename." | mysql");
+
+            $categorylinksPath = "temp/".$item->identifier."/".$file->filename;
+            if (!file_exists($categorylinksPath)) {
+                $this->warn('Downloaded file not found: '.$categorylinksPath.'. Skipping.');
+                return 0;
+            }
+
+            exec("zcat ".$categorylinksPath." | mysql");
             
             $this->info('Imported SQL-file categorylinks');
             $this->info("Sluttidspunkt: ".now());
@@ -55,7 +61,14 @@ class WikistatsGetCategoryLinksCommand extends Command
                 $this->info('Downloaded: '.$findPageFile->filename);
                 $this->info('Starting to import SQL-file page');
                 $this->info("Starttidspunkt: ".now());
-                exec("zcat temp/".$item->identifier."/".$findPageFile->filename." | mysql");
+
+                $pagePath = "temp/".$item->identifier."/".$findPageFile->filename;
+                if (!file_exists($pagePath)) {
+                    $this->warn('Downloaded file not found: '.$pagePath.'. Skipping.');
+                    return 0;
+                }
+
+                exec("zcat ".$pagePath." | mysql");
                 $this->info('Imported SQL-file page');
                 $this->info("Sluttidspunkt: ".now());
             }
