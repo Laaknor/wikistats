@@ -21,9 +21,11 @@ class GraphController extends Controller
         // Handle both single and double URL encoding
         $decodedGraph = urldecode($graph);
         $category = Category::where('site_id', $site->id)
-                           ->where('name', $decodedGraph)
-                           ->orWhere('name', $graph) // Also try the original in case it's not encoded
-                           ->firstOrFail();
+            ->where(function ($q) use ($decodedGraph, $graph) {
+                $q->where('name', $decodedGraph)
+                  ->orWhere('name', $graph); // Also try the original in case it's not encoded
+            })
+            ->firstOrFail();
         
         $graph = $this->buildChart($category, 'large');
         if (!$graph) {
@@ -40,9 +42,11 @@ class GraphController extends Controller
         // Handle both single and double URL encoding
         $decodedGraph = urldecode($graph);
         $category = Category::where('site_id', $site->id)
-                           ->where('name', $decodedGraph)
-                           ->orWhere('name', $graph) // Also try the original in case it's not encoded
-                           ->firstOrFail();
+            ->where(function ($q) use ($decodedGraph, $graph) {
+                $q->where('name', $decodedGraph)
+                  ->orWhere('name', $graph); // Also try the original in case it's not encoded
+            })
+            ->firstOrFail();
         
         $chart = $this->buildChart($category, 'small');
         if (!$chart) {
@@ -59,9 +63,11 @@ class GraphController extends Controller
         // Handle both single and double URL encoding
         $decodedGraph = urldecode($graph);
         $category = Category::where('site_id', $site->id)
-                           ->where('name', $decodedGraph)
-                           ->orWhere('name', $graph) // Also try the original in case it's not encoded
-                           ->firstOrFail();
+            ->where(function ($q) use ($decodedGraph, $graph) {
+                $q->where('name', $decodedGraph)
+                  ->orWhere('name', $graph); // Also try the original in case it's not encoded
+            })
+            ->firstOrFail();
         // For now, create a simple placeholder image
         // In production, you would use a library like Puppeteer, wkhtmltopdf, or similar to convert charts to images
         
