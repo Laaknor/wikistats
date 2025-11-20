@@ -33,15 +33,16 @@ class GetWikidataTrackingJob implements ShouldQueue
         foreach($data['sitelinks'] as $sitelink) 
         {
             $site = Site::parseUrl($sitelink['url']);
-            $category = Category::updateOrCreate([
+            $category = Category::firstOrCreate([
                 'site_id' => $site->id,
                 'wikidata_tracking_id' => $wd->id,
                 'name' => explode('/wiki/',$sitelink['url'])[1],
+            ],[
                 'type' => $wd->type,
             ]);
-                $wd->last_sync = now();
-                $wd->save();
-            }
         }
+        $wd->last_sync = now();
+        $wd->save();
+    }
     }
 }
