@@ -30,7 +30,23 @@ class GetCategoryCountsJob implements ShouldQueue
         $categories = Category::where('last_sync','<',now()->subDays(7))->inRandomOrder()->take(1)->get();
         foreach($categories as $category) {
             $url = $category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category->name.'&format=json';
-            $data = Http::get($url)->json();
+            $response = Http::get($url);
+            if(!$response->ok()) {
+                Log::error('Failed to fetch categoryinfo', [
+                    'category_id' => $category->id,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+                continue;
+            }
+            $data = $response->json();
+            if (!isset($data['query']['pages'])) {
+                Log::error('Missing pages key in categoryinfo response', [
+                    'category_id' => $category->id,
+                    'response' => $data,
+                ]);
+                continue;
+            }
             
             foreach($data['query']['pages'] as $c) {
                 $subcats = $c['categoryinfo']['subcats'] ?? 0;
@@ -54,7 +70,23 @@ class GetCategoryCountsJob implements ShouldQueue
                     }
                 } // End if categorycount
                 if($category->type == 'subcategorycount') {
-                    $catmembers = Http::get($category->site->url.'w/api.php?action=query&list=categorymembers&cmtitle='.$category->name.'&cmtype=subcat&cmlimit=500&format=json')->json();
+                    $catMemberResponse = Http::get($category->site->url.'w/api.php?action=query&list=categorymembers&cmtitle='.$category->name.'&cmtype=subcat&cmlimit=500&format=json');
+                    if(!$catMemberResponse->ok()) {
+                        Log::error('Failed to fetch categorymembers', [
+                            'category_id' => $category->id,
+                            'status' => $catMemberResponse->status(),
+                            'body' => $catMemberResponse->body(),
+                        ]);
+                        continue;
+                    }
+                    $catmembers = $catMemberResponse->json();
+                    if (!isset($catmembers['query']['categorymembers'])) {
+                        Log::error('Missing categorymembers key', [
+                            'category_id' => $category->id,
+                            'response' => $catmembers,
+                        ]);
+                        continue;
+                    }
                     $subcat_sumcount = 0;
                     $category_query = "";
                     $subcat_runs = 0;
@@ -63,11 +95,47 @@ class GetCategoryCountsJob implements ShouldQueue
                         $category_query .= $title.'|';
                         $subcat_runs++;
                         if($subcat_runs > 10) {
-                            $subcatcount = Http::get($category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category_query.'&format=json')->json();
+                            $subcatResponse = Http::get($category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category_query.'&format=json');
+                            if(!$subcatResponse->ok()) {
+                                Log::error('Failed to fetch subcategory batch', [
+                                    'category_id' => $category->id,
+                                    'titles' => $category_query,
+                                    'status' => $subcatResponse->status(),
+                                    'body' => $subcatResponse->body(),
+                                ]);
+                                $subcat_runs = 0;
+                                $category_query = "";
+                                continue;
+                            }
+                            $subcatcount = $subcatResponse->json();
+                            if (!isset($subcatcount['query']['pages'])) {
+                                Log::warning('Missing pages key in subcategory batch', [
+                                    'category_id' => $category->id,
+                                    'titles' => $category_query,
+                                    'response' => $subcatcount,
+                                ]);
+                                $subcat_runs = 0;
+                                $category_query = "";
+                                continue;
+                            }
                             $subcat_runs = 0;
+                            $pages = $subcatcount['query']['pages'];
+                            if (!array_key_exists($subcat['pageid'], $pages)) {
+                                Log::warning('Subcategory page missing in batch', [
+                                    'category_id' => $category->id,
+                                    'subcat_pageid' => $subcat['pageid'],
+                                    'titles' => $category_query,
+                                    'response_keys' => array_keys($pages),
+                                ]);
+                                $category_query = "";
+                                continue;
+                            }
                             $category_query = "";
-                            $subcat_sumcount += $subcatcount['query']['pages'][$subcat['pageid']]['categoryinfo']['pages'];
-                            foreach($subcatcount['query']['pages'] as $page) { $subcat_sumcount +=$page['categoryinfo']['pages'] ?? 0; }
+                            $primaryPage = $pages[$subcat['pageid']]['categoryinfo']['pages'] ?? 0;
+                            $subcat_sumcount += $primaryPage;
+                            foreach($pages as $pageId => $page) {
+                                $subcat_sumcount += $page['categoryinfo']['pages'] ?? 0;
+                            }
                             sleep(2); // Do not overload the API
                         }
                     }
