@@ -90,11 +90,19 @@ class GetCategoryCountsJob implements ShouldQueue
                     $subcat_sumcount = 0;
                     $category_query = "";
                     $subcat_runs = 0;
+                    $subcat_titles = []; // Track titles for this batch
+                    
                     foreach($catmembers['query']['categorymembers'] as $subcat) {
                         $title = str_replace(' ','_',$subcat['title']);
                         $category_query .= $title.'|';
+                        $subcat_titles[] = $title;
                         $subcat_runs++;
-                        if($subcat_runs > 10) {
+                        
+                        // Process batch when we reach 10 items
+                        if($subcat_runs >= 10) {
+                            // Remove trailing pipe
+                            $category_query = rtrim($category_query, '|');
+                            
                             $subcatResponse = Http::get($category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category_query.'&format=json');
                             if(!$subcatResponse->ok()) {
                                 Log::error('Failed to fetch subcategory batch', [
@@ -105,6 +113,7 @@ class GetCategoryCountsJob implements ShouldQueue
                                 ]);
                                 $subcat_runs = 0;
                                 $category_query = "";
+                                $subcat_titles = [];
                                 continue;
                             }
                             $subcatcount = $subcatResponse->json();
@@ -116,27 +125,45 @@ class GetCategoryCountsJob implements ShouldQueue
                                 ]);
                                 $subcat_runs = 0;
                                 $category_query = "";
+                                $subcat_titles = [];
                                 continue;
                             }
-                            $subcat_runs = 0;
+                            
+                            // Process the batch - match by title
                             $pages = $subcatcount['query']['pages'];
-                            if (!array_key_exists($subcat['pageid'], $pages)) {
-                                Log::warning('Subcategory page missing in batch', [
-                                    'category_id' => $category->id,
-                                    'subcat_pageid' => $subcat['pageid'],
-                                    'titles' => $category_query,
-                                    'response_keys' => array_keys($pages),
-                                ]);
-                                $category_query = "";
-                                continue;
-                            }
-                            $category_query = "";
-                            $primaryPage = $pages[$subcat['pageid']]['categoryinfo']['pages'] ?? 0;
-                            $subcat_sumcount += $primaryPage;
                             foreach($pages as $pageId => $page) {
-                                $subcat_sumcount += $page['categoryinfo']['pages'] ?? 0;
+                                // Normalize the title from API response
+                                $apiTitle = str_replace(' ', '_', $page['title']);
+                                // Check if this page is in our batch
+                                if(in_array($apiTitle, $subcat_titles)) {
+                                    $subcat_sumcount += $page['categoryinfo']['pages'] ?? 0;
+                                }
                             }
+                            
+                            // Reset for next batch
+                            $subcat_runs = 0;
+                            $category_query = "";
+                            $subcat_titles = [];
                             sleep(2); // Do not overload the API
+                        }
+                    }
+                    
+                    // Process any remaining subcategories (< 10)
+                    if($subcat_runs > 0 && !empty($category_query)) {
+                        $category_query = rtrim($category_query, '|');
+                        
+                        $subcatResponse = Http::get($category->site->url.'w/api.php?action=query&prop=categoryinfo&titles='.$category_query.'&format=json');
+                        if($subcatResponse->ok()) {
+                            $subcatcount = $subcatResponse->json();
+                            if (isset($subcatcount['query']['pages'])) {
+                                $pages = $subcatcount['query']['pages'];
+                                foreach($pages as $pageId => $page) {
+                                    $apiTitle = str_replace(' ', '_', $page['title']);
+                                    if(in_array($apiTitle, $subcat_titles)) {
+                                        $subcat_sumcount += $page['categoryinfo']['pages'] ?? 0;
+                                    }
+                                }
+                            }
                         }
                     }
                     
