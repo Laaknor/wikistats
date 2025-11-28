@@ -24,3 +24,7 @@ Schedule::job(new App\Jobs\GetArchiveMetadataJob())->everyFiveMinutes()
     ->when(function() {
         return App\Models\ArchiveItem::where('last_sync',null)->count() > 0;
     });
+Schedule::job(new App\Jobs\GetHistoricalSiteinfoJob())->everyFifteenMinutes()
+    ->when(function() {
+        return App\Models\ArchiveFile::where('filename','like','%-%-%site_stats%')->where('last_sync',null)->count() > 0;
+    });
