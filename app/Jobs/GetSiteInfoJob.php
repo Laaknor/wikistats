@@ -31,7 +31,7 @@ class GetSiteInfoJob implements ShouldQueue
             $url = $site->url.'w/api.php?action=query&meta=siteinfo&siprop=statistics&format=json';
             $data = Http::get($url)->json();
             foreach($data['query']['statistics'] as $stat => $count) {
-                if(in_array($stat,['pages','users','admins','images','edits','articles'])) {
+                if(in_array($stat,['pages','users','admins','images','edits','articles','activeusers'])) {
                     Siteinfo::updateOrCreate([
                         'site_id' => $site->id,
                         'info' => $stat,
