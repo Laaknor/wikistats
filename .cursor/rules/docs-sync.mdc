@@ -1,0 +1,18 @@
+---
+description: Keep docs/ in sync when implementing changes
+alwaysApply: true
+---
+
+# Update Documentation When Implementing Changes
+
+When you implement code changes that affect how the system works, **update the design docs in `docs/`** in the same work.
+
+- **Purpose, scope, or capabilities** → [docs/01-overview.md](docs/01-overview.md)
+- **Structure, integrations, or tech choices** → [docs/02-architecture.md](docs/02-architecture.md)
+- **Models, tables, or relationships** → [docs/03-data-model.md](docs/03-data-model.md)
+- **Scheduled jobs, queue behavior, or new jobs** → [docs/04-jobs-and-scheduling.md](docs/04-jobs-and-scheduling.md)
+- **Routes, screens, or user/admin flows** → [docs/05-user-flows.md](docs/05-user-flows.md)
+
+If you add a new doc, list it in [docs/README.md](docs/README.md).
+
+Do not leave design docs outdated after changing app code, migrations, routes, or jobs.
