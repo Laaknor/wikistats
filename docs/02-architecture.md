@@ -2,10 +2,10 @@
 
 ## High-Level Structure
 
-Wikistats is a Laravel application with:
+Maintenalyzer is a Laravel application with:
 
-- **Web layer** — Controllers and Blade views for public pages (site list, site detail with categories, graph views).
-- **Admin layer** — Filament panel for managing Wikidata trackings (and related data).
+- **Web layer** — Controllers and Blade views for public pages (site list, site detail with tabs and combined charts, graph/chart views).
+- **Admin layer** — Filament panel for managing Wikidata trackings (with group) and Charts (combined multi-series charts).
 - **Job layer** — Queued jobs that call external APIs and update the database; scheduled via Laravel’s scheduler.
 - **Queue worker** — Laravel Horizon for running and monitoring queue workers.
 
@@ -16,14 +16,14 @@ Wikistats is a Laravel application with:
 │  Web (public)        │  Admin (Filament)   │  Console / Scheduler  │
 │  - SiteController    │  - WikidataTracking │  - GetCategoryCounts │
 │  - GraphController   │    Resource          │  - GetSiteInfo        │
-│  - StaticPageController │                   │  - GetWikidataTracking │
+│  - StaticPageController │  - Chart Resource   │  - GetWikidataTracking │
 │                      │                      │  - GetArchiveMetadata   │
 │                      │                      │  - GetHistoricalSiteinfo │
 ├─────────────────────────────────────────────────────────────────┤
 │  Queue (Horizon)     │  Jobs run async, call APIs, write to DB    │
 ├─────────────────────────────────────────────────────────────────┤
-│  Database (MySQL etc.)  │  Sites, Categories, CategoryCounts,      │
-│  Siteinfos, WikidataTrackings, ArchiveItems, ArchiveFiles         │
+│  Database (MySQL etc.)  │  Sites, Categories, CategoryCounts, Charts,  │
+│  chart_category, Siteinfos, WikidataTrackings, ArchiveItems, ArchiveFiles │
 └─────────────────────────────────────────────────────────────────┘
          │                    │
          ▼                    ▼
@@ -40,8 +40,9 @@ Wikistats is a Laravel application with:
 |------|------|
 | `app/Http/Controllers/` | SiteController, GraphController, StaticPageController, TestController |
 | `app/Jobs/` | GetCategoryCountsJob, GetSiteInfoJob, GetWikidataTrackingJob, GetArchiveMetadataJob, GetHistoricalSiteinfoJob, GetSiteMatrixJob |
-| `app/Models/` | Site, Category, CategoryCount, Siteinfo, WikidataTracking, ArchiveItem, ArchiveFile, User |
-| `app/Filament/Resources/WikidataTrackings/` | Filament resource for Wikidata trackings (CRUD, table, form) |
+| `app/Models/` | Site, Category, CategoryCount, Chart, Siteinfo, WikidataTracking, ArchiveItem, ArchiveFile, User |
+| `app/Filament/Resources/WikidataTrackings/` | Filament resource for Wikidata trackings (CRUD, table, form, group) |
+| `app/Filament/Resources/Charts/` | Filament resource for Charts (CRUD, categories relation manager with pivot) |
 | `app/Livewire/` | ShowCategoryGraph, auth-related components |
 | `routes/web.php` | Public routes (sites, graphs, about, auth) |
 | `routes/console.php` | Scheduler: job and command schedules |

@@ -2,17 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Site;
 use App\Models\Category;
+use App\Models\Chart;
 use App\Models\CategoryCount;
+use App\Models\Site;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Illuminate\Support\Facades\Log;
 use IcehouseVentures\LaravelChartjs\Facades\Chartjs;
+use Illuminate\Support\Collection;
 
 class GraphController extends Controller
 {
+    /** Default colors for multiple series (Chart.js rgba or hex) */
+    private const CHART_COLORS = [
+        ['bg' => 'rgba(38, 185, 154, 0.31)', 'border' => 'rgba(38, 185, 154, 0.7)'],
+        ['bg' => 'rgba(59, 130, 246, 0.31)', 'border' => 'rgba(59, 130, 246, 0.7)'],
+        ['bg' => 'rgba(245, 158, 11, 0.31)', 'border' => 'rgba(245, 158, 11, 0.7)'],
+        ['bg' => 'rgba(239, 68, 68, 0.31)', 'border' => 'rgba(239, 68, 68, 0.7)'],
+        ['bg' => 'rgba(139, 92, 246, 0.31)', 'border' => 'rgba(139, 92, 246, 0.7)'],
+    ];
+
     /**
      * Show large graph for a category
      */
@@ -32,6 +41,51 @@ class GraphController extends Controller
             return view('graph.show', ['graph' => null, 'error' => 'Failed to create chart']);
         }
         return view('graph.show', compact('graph'));
+    }
+
+    /**
+     * Show large graph for a defined chart (multiple categories combined).
+     * Chart can be per-site or a template (site_id null) using WikidataTrackings; series resolved for this site.
+     */
+    public function showChart(Site $site, string $chartSlug)
+    {
+        $chart = Chart::where('slug', $chartSlug)
+            ->where(fn ($q) => $q->where('site_id', $site->id)->orWhereNull('site_id'))
+            ->with(['categories', 'trackings'])
+            ->firstOrFail();
+
+        $categories = $chart->getCategoriesForSite($site);
+        if ($categories->isEmpty()) {
+            return view('graph.show', ['graph' => null, 'error' => 'This chart has no data for this wiki.']);
+        }
+
+        $graph = $this->buildChartFromCategories($chart->name, $categories, 'large');
+        if (!$graph) {
+            return view('graph.show', ['graph' => null, 'error' => 'Failed to create chart']);
+        }
+        return view('graph.show', compact('graph'));
+    }
+
+    /**
+     * Show small graph for a defined chart (for embedding on site page).
+     */
+    public function showSmallChart(Site $site, string $chartSlug)
+    {
+        $chart = Chart::where('slug', $chartSlug)
+            ->where(fn ($q) => $q->where('site_id', $site->id)->orWhereNull('site_id'))
+            ->with(['categories', 'trackings'])
+            ->firstOrFail();
+
+        $categories = $chart->getCategoriesForSite($site);
+        if ($categories->isEmpty()) {
+            return view('graph.small', ['chart' => null, 'error' => 'This chart has no data for this wiki.']);
+        }
+
+        $chartObj = $this->buildChartFromCategories($chart->name, $categories, 'small');
+        if (!$chartObj) {
+            return view('graph.small', ['chart' => null, 'error' => 'Failed to create chart']);
+        }
+        return view('graph.small', ['chart' => $chartObj]);
     }
 
     /**
@@ -294,6 +348,103 @@ class GraphController extends Controller
         }
 
         return $chart;
+    }
+
+    /**
+     * Build a chart with multiple category series (for Chart model or combo view).
+     *
+     * @param  string  $title  Chart title (large size only).
+     * @param  Collection<int, Category>  $categories  Categories with pivot (label, color) when from Chart.
+     */
+    private function buildChartFromCategories(string $title, Collection $categories, string $size = 'large')
+    {
+        $categoryIds = $categories->pluck('id')->toArray();
+        $minDate = CategoryCount::whereIn('category_id', $categoryIds)->min('date');
+        $chartSize = $size === 'small'
+            ? ['width' => 300, 'height' => 120]
+            : ['width' => 800, 'height' => 400];
+        $chartName = 'Chart_' . $categories->implode('id', '_') . '_' . $size;
+
+        if (!$minDate) {
+            return Chartjs::build()
+                ->name($chartName)
+                ->type('line')
+                ->size($chartSize)
+                ->labels([])
+                ->datasets([[
+                    'label' => 'No Data',
+                    'backgroundColor' => 'rgba(156, 163, 175, 0.2)',
+                    'borderColor' => 'rgba(156, 163, 175, 0.8)',
+                    'data' => [],
+                ]]);
+        }
+
+        $start = Carbon::parse($minDate);
+        $end = now();
+        $period = CarbonPeriod::create($start, '1 month', $end);
+        $allMonths = collect($period)->map(fn ($date) => $date->copy()->endOfMonth()->format('Y-m'))->values()->toArray();
+
+        $datasets = [];
+        $index = 0;
+        foreach ($categories as $category) {
+            $pivot = $category->pivot ?? null;
+            $label = $pivot && $pivot->label ? $pivot->label : ($category->display_name ?? $category->name);
+            $colorIndex = $index % count(self::CHART_COLORS);
+            $colors = self::CHART_COLORS[$colorIndex];
+            if ($pivot && $pivot->color) {
+                $colors = ['bg' => $pivot->color, 'border' => $pivot->color];
+            }
+
+            $monthlyData = [];
+            foreach ($period as $date) {
+                $endDate = $date->copy()->endOfMonth();
+                $startDate = $date->copy()->startOfMonth();
+                $avgCount = CategoryCount::where('category_id', $category->id)
+                    ->where('date', '>=', $startDate)
+                    ->where('date', '<=', $endDate)
+                    ->avg('count');
+                $monthlyData[$endDate->format('Y-m')] = $avgCount !== null ? round($avgCount) : null;
+            }
+
+            $data = array_map(fn ($m) => $monthlyData[$m] ?? null, $allMonths);
+            $datasets[] = [
+                'label' => $label,
+                'backgroundColor' => $colors['bg'],
+                'borderColor' => $colors['border'],
+                'data' => $data,
+                'spanGaps' => true,
+                'borderWidth' => $size === 'small' ? 1 : 2,
+                'pointRadius' => $size === 'small' ? 1 : 3,
+            ];
+            $index++;
+        }
+
+        $chartOptions = [];
+        if ($size === 'small') {
+            $chartOptions = [
+                'plugins' => ['legend' => ['display' => false], 'title' => ['display' => false]],
+                'scales' => ['x' => ['display' => false], 'y' => ['display' => false]],
+                'elements' => ['point' => ['radius' => 1]],
+            ];
+        } else {
+            $chartOptions = [
+                'scales' => [
+                    'x' => ['type' => 'time', 'time' => ['unit' => 'month'], 'min' => $start->format('Y-m-d')],
+                    'y' => ['min' => 0],
+                ],
+                'plugins' => [
+                    'title' => ['display' => true, 'text' => $title],
+                ],
+            ];
+        }
+
+        return Chartjs::build()
+            ->name($chartName)
+            ->type('line')
+            ->size($chartSize)
+            ->labels($allMonths)
+            ->datasets($datasets)
+            ->options($chartOptions);
     }
 }
 

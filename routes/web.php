@@ -28,5 +28,10 @@ Route::get('site/{site:hostname}/graph-small/{graph:name}', [GraphController::cl
     ->name('graph.small');
 Route::get('site/{site:hostname}/graph-image/{graph:name}', [GraphController::class, 'showSmallImage'])
     ->name('graph.image');
+// Combined chart (multiple categories) by slug
+Route::get('site/{site:hostname}/chart/{chartSlug}', [GraphController::class, 'showChart'])
+    ->name('chart.show');
+Route::get('site/{site:hostname}/chart-small/{chartSlug}', [GraphController::class, 'showSmallChart'])
+    ->name('chart.small');
 Route::get('test', [App\Http\Controllers\TestController::class, 'index']);
 Route::get('about', [App\Http\Controllers\StaticPageController::class, 'about'])->name('about');

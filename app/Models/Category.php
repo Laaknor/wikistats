@@ -20,4 +20,10 @@ class Category extends Model
     {
         return $this->hasMany(CategoryCount::class);
     }
+
+    public function charts()
+    {
+        return $this->belongsToMany(Chart::class, 'chart_category')
+            ->withPivot(['sort_order', 'label', 'color']);
+    }
 }

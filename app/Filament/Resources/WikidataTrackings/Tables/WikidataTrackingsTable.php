@@ -28,6 +28,9 @@ class WikidataTrackingsTable
                     ->searchable(),
                 TextColumn::make('type')
                     ->searchable(),
+                TextColumn::make('group')
+                    ->badge()
+                    ->sortable(),
                 TextColumn::make('last_sync')
                     ->dateTime()
                     ->sortable(),

@@ -21,6 +21,13 @@ class WikidataTrackingForm
                     ->options([
                         'categorycount' => 'Category Count',
                     ]),
+                Select::make('group')
+                    ->options([
+                        'maintenance' => 'Maintenance',
+                        'content' => 'Content',
+                    ])
+                    ->placeholder('Other')
+                    ->helperText('Used to group categories into tabs on the site page (Maintenance / Content).'),
                 TextInput::make('name')
                     ->default(null),
                 Textarea::make('description')

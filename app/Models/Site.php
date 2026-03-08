@@ -12,6 +12,11 @@ class Site extends Model
     {
         return $this->hasMany(Category::class);
     }
+
+    public function charts()
+    {
+        return $this->hasMany(Chart::class);
+    }
     public static function parseUrl($url) 
     {
         $parsed = parse_url($url);

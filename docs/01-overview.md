@@ -8,7 +8,7 @@
 
 2. **Track site-level statistics** — For known wiki sites, it fetches and stores siteinfo statistics (pages, users, edits, articles, etc.) both from the live MediaWiki API and from historical dumps (e.g. Internet Archive).
 
-3. **Provide a public-facing dashboard** — Users can browse sites, see which categories are tracked, and view interactive or embedded charts of category growth over time.
+3. **Provide a public-facing dashboard** — Users can browse sites, see categories and combined charts grouped in tabs (e.g. Maintenance, Content), and view interactive or embedded single-category or multi-series charts over time.
 
 4. **Support administration of tracked items** — Administrators define what to track (e.g. Wikidata items whose sitelinks become categories to monitor) and the system keeps data up to date via background jobs.
 
@@ -22,7 +22,7 @@ The system is built to work with the **MediaWiki API** and **Wikidata** for disc
 | **Site info sync** | For each site, fetches current statistics (pages, users, edits, etc.) from the site’s `api.php?action=query&meta=siteinfo&siprop=statistics` and stores them by date. |
 | **Wikidata-driven discovery** | Administrators create “Wikidata trackings” by item ID. The system fetches sitelinks from the Wikidata API, creates or finds `Site` and `Category` records per sitelink, and keeps categories in sync. |
 | **Historical siteinfo** | For archive items (e.g. from Internet Archive) that contain `site_stats` SQL dumps, the system can download and import them and backfill historical `Siteinfo` rows. |
-| **Charts and embedding** | Category time-series are exposed as large and small charts (e.g. for detail and embed), with an optional image endpoint for simple PNG charts. |
+| **Charts and embedding** | Category time-series are exposed as large and small charts (single category or multiple series per chart). Admins can define “Charts” that combine several categories into one graph. Optional image endpoint for simple PNG charts. |
 
 
 ## Technology Context
