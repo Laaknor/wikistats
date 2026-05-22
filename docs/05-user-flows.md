@@ -66,7 +66,7 @@ Charts appear on the site show page in the “Combined charts” section of the 
 
 1. **Admin** creates a Wikidata tracking (item ID + type).
 2. **GetWikidataTrackingJob** (hourly, when due) fetches sitelinks and creates/associates Sites and Categories.
-3. **GetCategoryCountsJob** (every minute, when there are stale categories) updates one category per run: fetches categoryinfo (and optionally subcategory counts), writes CategoryCount for today, updates category type and last_sync.
+3. **GetCategoryCountsJob** (every minute, when there are stale active categories) updates one active category per run: fetches categoryinfo (and optionally subcategory counts), writes CategoryCount for today, updates category type and last_sync. If the wiki page no longer exists, the category is marked inactive (`is_active = false`) and no longer synced.
 4. **GetSiteInfoJob** (every 5 minutes, when there are stale sites) updates one site’s current statistics into Siteinfo.
 5. **Public user** browses sites → site show page (tabs by group) → combined chart cards and single-category cards with small charts and links to full graph/chart pages; graph and chart pages read CategoryCount data and render single- or multi-series charts (Chart.js or GD image).
 

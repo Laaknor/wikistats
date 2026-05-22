@@ -6,7 +6,7 @@ All background work is implemented as Laravel jobs (implementing `ShouldQueue`) 
 
 | Schedule | Job / Command | Condition |
 |----------|----------------|-----------|
-| Every minute | `GetCategoryCountsJob` | At least one Category with `last_sync` &lt; 7 days ago |
+| Every minute | `GetCategoryCountsJob` | At least one active Category with `last_sync` &lt; 7 days ago |
 | Every 5 minutes | `GetSiteInfoJob` | At least one Site with `last_siteinfo` &lt; 7 days ago or null |
 | Every 5 minutes | `GetArchiveMetadataJob` | At least one ArchiveItem with `is_active` and `last_sync` null |
 | Every 5 minutes | `horizon:snapshot` | Always |
@@ -23,13 +23,15 @@ Conditions use `when()` so the job is only dispatched when there is work to do.
 
 **Logic:**
 
-1. Select categories where `last_sync < now() - 7 days`, in random order, limit 1.
-2. For the chosen category, call the site’s API: `action=query&prop=categoryinfo&titles={name}`.
+1. Select active categories (`is_active = true`) where `last_sync < now() - 7 days`, in random order, limit 1.
+2. For the chosen category, call the site’s API: `action=query&prop=categoryinfo&titles={wikiApiTitle}` (URL-encoded, decoded from stored `name`).
 3. From the response:
+   - If the page is **missing** on the wiki (no `pageid` in the API page object), log a warning, set `is_active = false`, update `last_sync`, and skip further API calls for that category.
+4. Otherwise from the response:
    - Read `subcats` and `pages`. If `subcats > pages`, set category type to `subcategorycount`; else `categorycount`.
    - **categorycount:** store/update `CategoryCount` for today with `categoryinfo.pages`.
    - **subcategorycount:** call `list=categorymembers&cmtype=subcat`, then in batches of 10 subcategory titles call `prop=categoryinfo&titles=...`, sum the `pages` values, then store/update one `CategoryCount` for today with that sum. Sleep 2 seconds between batch requests.
-4. Update category’s `mw_category_id`, `display_name`, and `last_sync`.
+5. Update category’s `mw_category_id`, `display_name`, and `last_sync` (only when the page exists).
 
 **Rate limiting:** `sleep(2)` between subcategory batch API calls.
 

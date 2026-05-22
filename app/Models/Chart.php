@@ -50,15 +50,17 @@ class Chart extends Model
             foreach ($trackings as $tracking) {
                 $category = Category::where('site_id', $site->id)
                     ->where('wikidata_tracking_id', $tracking->id)
+                    ->where('is_active', true)
                     ->first();
                 if ($category) {
-                    $category->setRelation('pivot', (object)[
+                    $category->setRelation('pivot', (object) [
                         'label' => $tracking->pivot->label ?? null,
                         'color' => $tracking->pivot->color ?? null,
                     ]);
                     $categories->push($category);
                 }
             }
+
             return $categories;
         }
 

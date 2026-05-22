@@ -15,7 +15,8 @@ class SiteController extends Controller
     public function index()
     {
         //
-        $sites = Site::orderBy('family','asc')->orderBy('hostname','asc')->get();
+        $sites = Site::orderBy('family', 'asc')->orderBy('hostname', 'asc')->get();
+
         return view('sites.index', compact('sites'));
     }
 
@@ -40,7 +41,10 @@ class SiteController extends Controller
      */
     public function show(Site $site)
     {
-        $categories = Category::where('site_id', $site->id)->with('wikidata_tracking')->get();
+        $categories = Category::where('site_id', $site->id)
+            ->where('is_active', true)
+            ->with('wikidata_tracking')
+            ->get();
         $charts = Chart::where('site_id', $site->id)
             ->orWhereNull('site_id')
             ->with(['categories', 'trackings'])
@@ -52,12 +56,12 @@ class SiteController extends Controller
 
         $groupOrder = ['maintenance' => 'Maintenance', 'content' => 'Content', 'other' => 'Other'];
         $tabs = collect($groupOrder)->keys()->filter(function ($key) use ($categoriesByGroup, $chartsByGroup) {
-            return ($categoriesByGroup->get($key, collect())->isNotEmpty())
+            return $categoriesByGroup->get($key, collect())->isNotEmpty()
                 || ($chartsByGroup->get($key, collect())->isNotEmpty());
         })->values()->all();
 
         $activeTab = request()->query('tab');
-        if (!in_array($activeTab, $tabs, true)) {
+        if (! in_array($activeTab, $tabs, true)) {
             $activeTab = $tabs[0] ?? null;
         }
 

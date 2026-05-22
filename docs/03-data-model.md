@@ -54,6 +54,7 @@ A category on a wiki that is tracked for counts. Created from Wikidata sitelinks
 | name | text | Wiki category page name (e.g. with underscores) |
 | type | string | `categorycount` or `subcategorycount` (set by GetCategoryCountsJob) |
 | last_sync | datetime | Last time counts were synced |
+| is_active | bool | When false, the category was deleted (or missing) on the wiki; GetCategoryCountsJob skips it |
 | mw_category_id | int, nullable | MediaWiki page id |
 | display_name | string, nullable | Human-readable title (e.g. with spaces) |
 | timestamps | | created_at, updated_at |
