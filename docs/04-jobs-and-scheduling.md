@@ -105,6 +105,28 @@ Conditions use `when()` so the job is only dispatched when there is work to do.
 
 ---
 
+## wikistats:getcategorycount
+
+**Purpose:** Manually import historical category page counts from archive `categorylinks` and `page` SQL dumps.
+
+**Logic:**
+
+1. Select one unsynced ArchiveFile where filename matches `%-%-%categorylinks%.sql.gz` and `dbname` matches an existing Site.
+2. Download and import the `categorylinks` dump, then download and import the matching `page` dump if present.
+3. For each Category on the matching Site:
+   - Convert the category display title after the namespace prefix to the MediaWiki dump format (spaces become underscores).
+   - **categorycount:** count matching `categorylinks` rows with `cl_type = page`.
+   - **subcategorycount:** find subcategory page titles through `categorylinks` and `page`, then count page rows linked to those subcategories.
+4. Store/update CategoryCount rows for the ArchiveItem publish date, mark the ArchiveFile synced, clean up temp files, and drop the imported `categorylinks` and `page` tables.
+
+**SQL safety:** Category names are passed as bound query parameters so names containing apostrophes or other SQL-significant characters are handled correctly.
+
+**Dependency:** `ia` CLI, `zcat`, and `mysql` client for import. Database must accept the dump’s schema.
+
+**Models:** Site, Category, CategoryCount, ArchiveItem, ArchiveFile.
+
+---
+
 ## GetSiteMatrixJob
 
 Present in the codebase; not referenced in `routes/console.php`. Likely intended for populating or updating sites from the MediaWiki site matrix; not part of the current schedule.

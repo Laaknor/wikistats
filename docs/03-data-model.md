@@ -211,7 +211,7 @@ A file belonging to an archive item (e.g. a SQL dump). Used to find and import h
 
 **Relations:** `archive_item`.
 
-**Usage:** GetHistoricalSiteinfoJob looks for files with filename like `%-%-%site_stats%`, downloads and imports the SQL, then fills Siteinfo from the temporary `site_stats` table and sets `last_sync` on the ArchiveFile.
+**Usage:** GetHistoricalSiteinfoJob looks for files with filename like `%-%-%site_stats%`, downloads and imports the SQL, then fills Siteinfo from the temporary `site_stats` table and sets `last_sync` on the ArchiveFile. The `wikistats:getcategorycount` command similarly processes `%-%-%categorylinks%.sql.gz` files with matching `page` dumps to backfill CategoryCount rows.
 
 ---
 
@@ -232,7 +232,7 @@ Standard Laravel user; used for auth and Filament panel access (FilamentUser).
 
 1. **Sites** are created when processing Wikidata sitelinks (`Site::parseUrl`) or when matching archive filenames (dbname).
 2. **Categories** are created by GetWikidataTrackingJob from sitelinks (one per sitelink per tracking); type may be updated by GetCategoryCountsJob.
-3. **CategoryCounts** are written by GetCategoryCountsJob (one row per category per day).
+3. **CategoryCounts** are written by GetCategoryCountsJob (live API counts) and `wikistats:getcategorycount` (historical dump counts).
 4. **Charts** and **chart_category** are created and updated in the Filament admin (Chart resource); no job writes them.
 5. **Siteinfo** rows are written by GetSiteInfoJob (live) and GetHistoricalSiteinfoJob (from dumps).
 6. **ArchiveItems** and **ArchiveFiles** are created/updated by GetArchiveMetadataJob from `ia metadata`.
