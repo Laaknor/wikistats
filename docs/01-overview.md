@@ -27,8 +27,8 @@ The system is built to work with the **MediaWiki API** and **Wikidata** for disc
 
 ## Technology Context
 
-- **Framework:** Laravel (PHP)
-- **Admin UI:** Filament
+- **Framework:** Laravel 13 (PHP 8.3+)
+- **Admin UI:** Filament 5 (Livewire 4)
 - **Queue:** Laravel queues (Horizon for supervision)
 - **Charts:** Chart.js (via `icehouseventures/laravel-chartjs`), plus a simple GD-based image endpoint for small charts
 - **External APIs:** MediaWiki `api.php`, Wikidata REST (`wikibase/v1/entities/items/…`), Internet Archive CLI (`ia metadata`, `ia download`)

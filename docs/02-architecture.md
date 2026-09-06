@@ -69,9 +69,10 @@ Maintenalyzer is a Laravel application with:
 
 ## Dependencies
 
-- Laravel (core, queue, scheduler, HTTP client).
-- Filament (admin panel).
+- Laravel 13 (core, queue, scheduler, HTTP client).
+- Filament 5 (admin panel) on Livewire 4.
 - Horizon (queue monitoring).
-- Chart.js / IcehouseVentures Laravel Chart.js (graphs).
+- Chart.js / IcehouseVentures Laravel Chart.js 5 (graphs).
 - PHP GD (for small chart image endpoint).
 - Internet Archive CLI (`ia`) for archive metadata and downloads.
+- Frontend build: Vite 8, Tailwind CSS 4.
