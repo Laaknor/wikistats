@@ -211,7 +211,7 @@ A file belonging to an archive item (e.g. a SQL dump). Used to find and import h
 
 **Relations:** `archive_item`.
 
-**Usage:** GetHistoricalSiteinfoJob looks for files with filename like `%-%-%site_stats%`, downloads and imports the SQL, then fills Siteinfo from the temporary `site_stats` table and sets `last_sync` on the ArchiveFile. The `wikistats:getcategorycount` command similarly processes `%-%-%categorylinks%.sql.gz` files with matching `page` dumps to backfill CategoryCount rows.
+**Usage:** GetHistoricalSiteinfoJob looks for files with filename like `%-%-%site_stats%`, downloads and imports the SQL, then fills Siteinfo from the temporary `site_stats` table and sets `last_sync` on the ArchiveFile. The `wikistats:getcategorycount` command processes `%-%-%categorylinks%.sql.gz` files only when a matching `%-page.sql.gz` dump exists for the same archive item, then backfills CategoryCount rows.
 
 ---
 

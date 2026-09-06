@@ -111,9 +111,9 @@ Conditions use `when()` so the job is only dispatched when there is work to do.
 
 **Logic:**
 
-1. Select one unsynced ArchiveFile where filename matches `%-%-%categorylinks%.sql.gz` and `dbname` matches an existing Site.
-2. Download and import the `categorylinks` dump, then download and import the matching `page` dump if present.
-3. For each Category on the matching Site:
+1. Select one unsynced ArchiveFile where filename matches `%-%-%categorylinks%.sql.gz`, `dbname` matches an existing Site, and a matching `%-page.sql.gz` ArchiveFile exists for the same archive item and dbname. If categorylinks dumps remain but none have a page dump, warn and exit without downloading.
+2. Download both dumps, then confirm both local files exist before importing either. If either file is missing, skip import and do not mark the ArchiveFile synced.
+3. Import both SQL dumps, then for each Category on the matching Site:
    - Convert the category display title after the namespace prefix to the MediaWiki dump format (spaces become underscores).
    - **categorycount:** count matching `categorylinks` rows with `cl_type = page`.
    - **subcategorycount:** find subcategory page titles through `categorylinks` and `page`, then count page rows linked to those subcategories.
